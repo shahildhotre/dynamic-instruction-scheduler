@@ -17,8 +17,13 @@ typedef struct issue_queue{
     bool rs2_rdy;
     long int rs1_tag_or_val;
     long int rs2_tag_or_val;
+    unsigned long long inst_num;
+    unsigned long int pc;
+    int optype;
+    int cycles;
+    int age;
 
-    issue_queue(bool valid, long int d_tag, bool rs1_rdy, bool rs2_rdy, long int rs1_tag_or_val, long int rs2_tag_or_val)
+    issue_queue(bool valid, long int d_tag, bool rs1_rdy, bool rs2_rdy, long int rs1_tag_or_val, long int rs2_tag_or_val, unsigned long long inst_num, unsigned long int pc, int optype, int cycles, int age)
     {
         this->valid = valid;
         this->d_tag = d_tag;
@@ -26,6 +31,11 @@ typedef struct issue_queue{
         this->rs1_tag_or_val = rs1_tag_or_val;
         this->rs2_rdy = rs2_rdy;
         this->rs2_tag_or_val = rs2_tag_or_val;
+        this->inst_num = inst_num;
+        this->pc = pc;
+        this->optype = optype;
+        this->cycles = cycles;
+        this->age = age;
     }
 }issue_queue;
 
@@ -36,8 +46,9 @@ typedef struct reorder_buffer{
     bool exc;
     bool miss_pred;
     unsigned long long pc;
+    bool valid;
 
-    reorder_buffer(long int value, long int dest, bool rdy, bool exc, bool miss_pred, unsigned long long pc)
+    reorder_buffer(long int value, long int dest, bool rdy, bool exc, bool miss_pred, unsigned long long pc, bool valid)
     {
         this->value = value;
         this->dest = dest;
@@ -45,6 +56,7 @@ typedef struct reorder_buffer{
         this->exc = exc;
         this->miss_pred = miss_pred;
         this->pc = pc;
+        this->valid = valid;
     }
 }reorder_buffer;
 
