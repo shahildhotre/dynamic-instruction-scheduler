@@ -77,7 +77,7 @@ void retire()
             num_of_instruction_in_pipeline--;
         }
     }
-    std::cout<<"===============================================retire compplete"<<std::endl;
+    // std::cout<<"===============================================retire compplete"<<std::endl;
     // return;
 
 }
@@ -86,12 +86,17 @@ void writeback()
 {
     if(!WB.empty)
     {
-        std::cout<<"wb not empty"<<std::endl;
+        // printf("WB Empty\n");
         for(int i=0; i<width*5; i++)
         {
             int check = WB.reg[i].inst_num;
             for(int j=0; j<rob_size; j++)
-            {   std::cout<<reorder_buffer_table[j].valid<<", "<<reorder_buffer_table[j].rdy<<", "<<reorder_buffer_table[j].pc<<", "<<check<<std::endl;
+            {   
+                // if(debug==15)
+                // {
+                //     std::cout<<reorder_buffer_table[j].valid<<", "<<reorder_buffer_table[j].rdy<<", "<<reorder_buffer_table[j].pc<<", "<<check<<std::endl;
+                // }
+                // std::cout<<reorder_buffer_table[j].valid<<", "<<reorder_buffer_table[j].rdy<<", "<<reorder_buffer_table[j].pc<<", "<<check<<std::endl;
                 if(reorder_buffer_table[j].valid == true && reorder_buffer_table[j].rdy == false && reorder_buffer_table[j].pc == check)
                 {
                     reorder_buffer_table[j].rdy = true;
@@ -124,9 +129,7 @@ void writeback()
             }
         }
     }
-    // debug++;
-    // std::cout<<debug<<std::endl;
-    std::cout<<"wb empty"<<std::endl;
+    // std::cout<<"wb empty"<<std::endl;
     return;
 }
 
@@ -134,7 +137,8 @@ void execute()
 {
     if(!ex_list.empty)
     {
-        std::cout<<"ex not empty"<<std::endl;
+        // printf("EX Empty\n");
+        // std::cout<<"ex not empty"<<std::endl;
         for(int i = 0; i<width*5; i++)
         {
             if(ex_list.reg[i].cycles>0)
@@ -204,6 +208,7 @@ void execute()
                     }
                 }
 
+                // printf("i am here hurray\n");
                 WB.current_size++;
                 WB.empty = false;
                 wb_pos = (wb_pos + 1)%(width*5);
@@ -219,7 +224,7 @@ void execute()
             }
         }
     }
-    std::cout<<"execute empty"<<std::endl;
+    // std::cout<<"execute empty"<<std::endl;
     return;
 }
 
@@ -249,7 +254,8 @@ void issue()
 {
     if(!iq_empty())
     {
-        std::cout<<"issue not empty"<<std::endl;
+        // printf("IQ EMpty\n");
+        // std::cout<<"issue not empty"<<std::endl;
         for(int i=0; i<iq_size; i++)
         {
             if( issue_queue_table[i].inst_num != -1 && issue_queue_table[i].valid == true && output_table[issue_queue_table[i].inst_num].IS.first == 0)
@@ -298,9 +304,9 @@ void issue()
         }
 
         ex_list.empty = false;
-        ex_list.full = false;
+        // ex_list.full = false;
     }
-    std::cout<<"issue empty"<<std::endl;
+    // std::cout<<"issue empty"<<std::endl;
     return;
 }
 
@@ -329,7 +335,8 @@ void dispatch()
 {
     if(!DI.empty)
     {
-        std::cout<<"dispatch not empty"<<std::endl;
+        // printf("DI Empty\n");
+        // std::cout<<"dispatch not empty"<<std::endl;
         bool iq_full = check_iq_status();
         if(iq_full)
         {
@@ -392,7 +399,7 @@ void dispatch()
                     if(src1 <rob_size && reorder_buffer_table[src1].valid && DI.reg[i].rob_rs1)
                     {
                         issue_queue_table[iq_pos].rs1_rdy = reorder_buffer_table[src1].rdy;
-                        issue_queue_table->rs1_tag_or_val = src1;
+                        issue_queue_table[iq_pos].rs1_tag_or_val = src1;
                     }
                     else
                     {
@@ -452,7 +459,7 @@ void dispatch()
             DI.full = false;
         }
     }
-    std::cout<<"dispatch empty"<<std::endl;
+    // std::cout<<"dispatch empty"<<std::endl;
     return;
 }
 
@@ -479,7 +486,7 @@ void regread()
         else
         {
             //copy RR to DI
-            std::cout<<"why am i not here"<<std::endl;
+            // std::cout<<"why am i not here"<<std::endl;
 
             for(int i= 0; i<width; i++)
             {
@@ -537,8 +544,8 @@ void regread()
         }
     }
     // std::cout<<"regread complete"<<std::endl;
-    debug++;
-    std::cout<<debug<<std::endl;
+    // debug++;
+    // std::cout<<debug<<std::endl;
     return;
 }
 
@@ -558,7 +565,7 @@ bool check_rob_status()
         return false;
     }
 
-    printf("rob full\n");
+    // printf("rob full\n");
     return true;
 }
 
@@ -568,10 +575,11 @@ void rename()
     {
         bool rob_full = check_rob_status();
 
+        // std::cout<<RR.full<<std::endl;
         if(RR.full || rob_full )
         {
-            std::cout<<RR.full<<std::endl;
-            printf("RN full\n");
+            
+            
             for(int i=0; i<width; i++)
             {
                 if(RN.reg[i].inst_num != -1 && output_table[RN.reg[i].inst_num].RN.first == 0)
@@ -591,11 +599,12 @@ void rename()
         {
             for(int i=0; i<width; i++)
             {
-                int src1, src2, dest = -1;
+                int src1 = -1 ,src2 = -1,dest = -1;
 
                 src1 = RN.reg[i].rs1;
                 src2 = RN.reg[i].rs2;
                 dest = RN.reg[i].dest_reg;
+                
 
                 RR.reg[i].rob_rs1 = false;
                 RR.reg[i].rob_rs2 = false;
@@ -620,6 +629,7 @@ void rename()
                     }
                 }
 
+                
                 if(RN.reg[i].dest_reg!=-1)
                 {
                     rename_map_table[RN.reg[i].dest_reg].valid = true;
@@ -649,7 +659,8 @@ void rename()
 
                     rob_tail = (rob_tail+1)%rob_size; //cyclic queue 
                 }
-
+                
+                // printf("rob empty\n");
                 RR.reg[i].inst_num = RN.reg[i].inst_num;
                 RR.reg[i].cycles = RN.reg[i].cycles;
                 RR.reg[i].pc = RN.reg[i].pc;
@@ -680,14 +691,14 @@ void rename()
                 RN.reg[i].rs2_rdy = false;
             }
 
-            std::cout<<"rr not empty"<<std::endl;
+            // std::cout<<"rr not empty"<<std::endl;
             RN.empty = true;
             RN.full = false;
             RR.empty = false;
             RR.full = true;
         }
     }
-    std::cout<<"rename complete"<<std::endl;
+    // std::cout<<"rename complete"<<std::endl;
     
     return;
 }
@@ -698,6 +709,7 @@ void decode()
     {
         if(RN.full)
         {
+            // printf("RN Full ");
             for(int i=0; i<width; i++)
             {
                 if(DE.reg[i].inst_num != -1 && output_table[DE.reg[i].inst_num].DE.first == 0)
@@ -747,15 +759,21 @@ void decode()
                 DE.reg[i].dest_reg=0;
                 DE.reg[i].rs1=0;
                 DE.reg[i].rs2=0;
+                DE.reg[i].rob_rs1 =0;
+                DE.reg[i].rob_rs2 =0;
+                DE.reg[i].rs1_rdy = false;
+                DE.reg[i].rs2_rdy = false;
+
+
             }
-            std::cout<<"RN not empty"<<std::endl;
+            // std::cout<<"RN not empty"<<std::endl;
             DE.empty = true;
             DE.full = false;
             RN.empty = false;
             RN.full = true;
         }
     }
-    std::cout<<"decode empty"<<std::endl;
+    // std::cout<<"decode empty"<<std::endl;
     
     return;
 }
@@ -764,7 +782,7 @@ void fetch(FILE **fp)
 {
     if(DE.full || trace_depleted)
     {
-        printf("DE full\n");
+        // printf("DE full\n");
         return;
     }
 
@@ -805,7 +823,7 @@ void fetch(FILE **fp)
             
             output_table.push_back(output(DE.reg[i].optype, {src1, src2}, dest, {sim_cycle, 1}, {0, 0}, {0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}));
             num_of_instruction_in_pipeline++;
-            std::cout<<"fetching"<<std::endl;
+            // std::cout<<"fetching"<<std::endl;
         }
         else
         {
@@ -815,7 +833,7 @@ void fetch(FILE **fp)
 
     }
     
-    std::cout<<"=======================fetch complete"<<std::endl;
+    // std::cout<<"=======================fetch complete"<<std::endl;
     return;
 }
 
@@ -827,6 +845,10 @@ bool adv_cycle()
     {
         return false;
     }
+    // if(debug==23)
+    // {
+    //     return false;
+    // }
 
     return true;
 }
@@ -930,7 +952,7 @@ int main (int argc, char* argv[])
     ex_list.empty= true; 
     WB.empty = true;
 
-    std::cout<<DE.empty<<", "<<RN.empty<<", "<<RR.empty<<", "<<DI.empty<<", "<<ex_list.empty<<", "<<WB.empty<<std::endl;
+    // std::cout<<DE.empty<<", "<<RN.empty<<", "<<RR.empty<<", "<<DI.empty<<", "<<ex_list.empty<<", "<<WB.empty<<std::endl;
     DE.current_size, RN.current_size, RR.current_size, DI.current_size, ex_list.current_size, WB.current_size = 0;
 
     width = params.width;
@@ -962,16 +984,61 @@ int main (int argc, char* argv[])
         issue();
         dispatch();
         regread();
-        printf("================================================\n");
+        // printf("================================================\n");
         rename();
         // printf("rename skip\n");
         decode();
         // printf("decode skip\n");
         fetch(&FP);
         // printf("fetch skip\n");
-        if(debug==21)
+        debug++;
+        if(debug==0)
         {
-            for(int i=0;i<rob_size ;i++)
+            std::cout<<"=============================================="<<debug<<std::endl;
+            for(int i=0;i<width;i++)
+            {
+                printf("%d ",DI.reg[i].inst_num);
+                printf("%d ",DI.reg[i].rob_rs1);
+                printf("%d ",DI.reg[i].rob_rs2);
+                printf("%d ",DI.reg[i].rs1_rdy);
+                printf("%d ",DI.reg[i].rs2_rdy);
+                printf("%d ",DI.reg[i].dest_reg);
+                printf("%d ",DI.reg[i].rs1);
+                printf("%d ",DI.reg[i].rs2);
+            }
+
+            printf("\n");
+            printf("\n");
+            for(int i=0;i<iq_size;i++)
+            {
+                printf("%d ",issue_queue_table[i].valid);
+                printf("%d ",issue_queue_table[i].d_tag);
+                printf("%d ",issue_queue_table[i].rs1_rdy);
+                printf("%d ",issue_queue_table[i].rs1_tag_or_val);
+                printf("%d ",issue_queue_table[i].rs2_rdy);
+                printf("%d ",issue_queue_table[i].rs2_tag_or_val);
+                printf("%d ",issue_queue_table[i].age);
+                printf("\n");
+            }
+            printf("\n");
+
+            for(int i=0;i<width*5; i++)
+            {
+                printf("%d ",ex_list.reg[i].cycles);
+                printf("%d ",ex_list.reg[i].inst_num);
+                printf("%d ",ex_list.reg[i].rob_rs1);
+                printf("%d ",ex_list.reg[i].rob_rs2);
+                printf("%d ",ex_list.reg[i].pc);
+                printf("%d ",ex_list.reg[i].optype);
+                printf("%d ",ex_list.reg[i].dest_reg);
+                printf("%d ",ex_list.reg[i].rs1);
+                printf("%d ",ex_list.reg[i].rs2);
+                printf("\n");
+                
+            }
+            printf("\n");
+            printf("\n");
+            for(int i=0;i<rob_size;i++)
             {
                 printf("%d ",reorder_buffer_table[i].valid);
                 printf("%d ",reorder_buffer_table[i].value);
@@ -982,21 +1049,72 @@ int main (int argc, char* argv[])
                 printf("%d ",reorder_buffer_table[i].pc);
                 printf("\n");
             }
+            printf("\n");
+            for(int i=0;i<width;i++)
+            {
+                printf("%d ",RR.reg[i].inst_num);
+                printf("%d ",RR.reg[i].rob_rs1);
+                printf("%d ",RR.reg[i].rob_rs2);
+                printf("%d ",RR.reg[i].rs1_rdy);
+                printf("%d ",RR.reg[i].rs2_rdy);
+                printf("%d ",RR.reg[i].dest_reg);
+                printf("%d ",RR.reg[i].rs1);
+                printf("%d ",RR.reg[i].rs2);
+            }
+            
+            printf("\n");
 
-            break;
+            for(int i=0;i<width;i++)
+            {
+                printf("%d ",RN.reg[i].inst_num);
+                printf("%d ",RN.reg[i].rob_rs1);
+                printf("%d ",RN.reg[i].rob_rs2);
+                printf("%d ",RN.reg[i].rs1_rdy);
+                printf("%d ",RN.reg[i].rs2_rdy);
+                printf("%d ",RN.reg[i].dest_reg);
+                printf("%d ",RN.reg[i].rs1);
+                printf("%d ",RN.reg[i].rs2);
+            }
+
+            printf("\n");
+
+            for(int i=0;i<width;i++)
+            {
+                printf("%d ",DE.reg[i].inst_num);
+                printf("%d ",DE.reg[i].rob_rs1);
+                printf("%d ",DE.reg[i].rob_rs2);
+                printf("%d ",DE.reg[i].rs1_rdy);
+                printf("%d ",DE.reg[i].rs2_rdy);
+                printf("%d ",DE.reg[i].dest_reg);
+                printf("%d ",DE.reg[i].rs1);
+                printf("%d ",DE.reg[i].rs2);
+            }
+
+            
+
         }
+    
+
     } while (adv_cycle());
 
-    std::cout<<"# === Simulator Command ========\n"<<std::endl;
-    std::cout<<argv[0]<<", "<<params.rob_size<<", "<<params.iq_size<<", "<<params.width<<", "<<trace_file<<std::endl;
+    for(int i=0;i<output_table.size();i++)
+    {
+        printf("%d fu{%d} src{%d,%d} dst{%d} FE{%d,%d} DE{%d,%d} RN{%d,%d} RR{%d,%d} DI{%d,%d} IS{%d,%d} EX{%d,%d} WB{%d,%d} RT{%d,%d}\n",i,output_table[i].fu,output_table[i].src.first,output_table[i].src.second,output_table[i].dest,output_table[i].FE.first,output_table[i].FE.second,output_table[i].DE.first,output_table[i].DE.second,output_table[i].RN.first,output_table[i].RN.second,output_table[i].RR.first,output_table[i].RR.second,output_table[i].DI.first,output_table[i].DI.second,output_table[i].IS.first,output_table[i].IS.second,output_table[i].EX.first,output_table[i].EX.second,output_table[i].WB.first,output_table[i].WB.second,output_table[i].RT.first,output_table[i].RT.second);
+
+    }
+    printf("\n");
+
+    std::cout<<"# === Simulator Command ========"<<std::endl;
+    std::cout<<argv[0]<<" "<<params.rob_size<<" "<<params.iq_size<<" "<<params.width<<" "<<trace_file<<std::endl;
     std::cout<<"# === Processor Configuration ===#"<<std::endl;
-    printf("ROB_SIZE=%lu "
-            "IQ_SIZE=%lu "
-            "WIDTH=%lu \n", params.rob_size, params.iq_size, params.width);
-    std::cout<<"# === Simulator Results ========\n"<<std::endl;
+    std::cout<<"ROB_SIZE = "<<params.rob_size<<std::endl;
+    std::cout<<"IQ_SIZE = "<<params.iq_size<<std::endl;
+    std::cout<<"WIDTH = "<<params.width<<std::endl;
+    std::cout<<"# === Simulator Results ========"<<std::endl;
     std::cout<<"# Dynamic Instruction Count = "<<dynamic_instrunct_count<<std::endl;
     std::cout<<"# Cycles = "<<sim_cycle<<std::endl;
-    std::cout<<"# Instructions Per Cycle = "<<float(dynamic_instrunct_count)/float(sim_cycle)<<std::endl;
+    printf("# Instructions Per Cycle = %.2f",float(dynamic_instrunct_count)/float(sim_cycle));
+    // std::cout<<"# Instructions Per Cycle = "<<(((float(dynamic_instrunct_count)/float(sim_cycle))*100)/100)<<std::endl;
     
 
 
