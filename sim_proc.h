@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <utility>
+#include <limits.h>
 
 typedef struct proc_params{
     unsigned long int rob_size;
@@ -147,10 +148,11 @@ typedef struct whole_OO_reg{
 
 typedef struct output{
     unsigned int fu;
-    unsigned int dest;
-    std::pair<unsigned long long, unsigned long long> src, FE, DE, RN, RR, DI, IS, EX, WB, RT;
+    std::pair<int, int> src;
+    int dest;
+    std::pair<unsigned long long, unsigned long long> FE, DE, RN, RR, DI, IS, EX, WB, RT;
 
-    output(unsigned int fu,  std::pair<unsigned long long, unsigned long long> src, unsigned int dest, std::pair<unsigned long long, unsigned long long> FE, std::pair<unsigned long long, unsigned long long> DE, std::pair<unsigned long long, unsigned long long> RN, std::pair<unsigned long long, unsigned long long> RR, std::pair<unsigned long long, unsigned long long> DI, std::pair<unsigned long long, unsigned long long> IS, std::pair<unsigned long long, unsigned long long> EX, std::pair<unsigned long long, unsigned long long> WB, std::pair<unsigned long long, unsigned long long> RT){
+    output(unsigned int fu,  std::pair<int, int> src, int dest, std::pair<unsigned long long, unsigned long long> FE, std::pair<unsigned long long, unsigned long long> DE, std::pair<unsigned long long, unsigned long long> RN, std::pair<unsigned long long, unsigned long long> RR, std::pair<unsigned long long, unsigned long long> DI, std::pair<unsigned long long, unsigned long long> IS, std::pair<unsigned long long, unsigned long long> EX, std::pair<unsigned long long, unsigned long long> WB, std::pair<unsigned long long, unsigned long long> RT){
         this->fu = fu;
         this->src = src;
         this->dest = dest;
