@@ -820,8 +820,13 @@ void fetch(FILE **fp)
             {
                 DE.reg[i].cycles = 5;
             }
+
+            // std::cout<<src1<<src2<<dest<<std::endl;
             
-            output_table.push_back(output(DE.reg[i].optype, {src1, src2}, dest, {sim_cycle, 1}, {0, 0}, {0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}));
+            output_table.push_back(output(DE.reg[i].optype, std::make_pair(src1, src2), dest, std::make_pair(sim_cycle, 1), std::make_pair(0,0), std::make_pair(0,0),std::make_pair(0,0),std::make_pair(0,0),std::make_pair(0,0),std::make_pair(0,0),std::make_pair(0,0),std::make_pair(0,0)));
+
+            // std::cout<<output_table[0].src.first<<output_table[0].src.second<<output_table[0].dest<<std::endl;
+            
             num_of_instruction_in_pipeline++;
             // std::cout<<"fetching"<<std::endl;
         }
@@ -1102,18 +1107,36 @@ int main (int argc, char* argv[])
         printf("%d fu{%d} src{%d,%d} dst{%d} FE{%d,%d} DE{%d,%d} RN{%d,%d} RR{%d,%d} DI{%d,%d} IS{%d,%d} EX{%d,%d} WB{%d,%d} RT{%d,%d}\n",i,output_table[i].fu,output_table[i].src.first,output_table[i].src.second,output_table[i].dest,output_table[i].FE.first,output_table[i].FE.second,output_table[i].DE.first,output_table[i].DE.second,output_table[i].RN.first,output_table[i].RN.second,output_table[i].RR.first,output_table[i].RR.second,output_table[i].DI.first,output_table[i].DI.second,output_table[i].IS.first,output_table[i].IS.second,output_table[i].EX.first,output_table[i].EX.second,output_table[i].WB.first,output_table[i].WB.second,output_table[i].RT.first,output_table[i].RT.second);
 
     }
-    printf("\n");
+    // printf("\n");
+    // int i = 0;
+    // for(const auto& elem: output_table)
+    // {
+    //     std::cout<<i<<" ";
+    //     std::cout << "fu{" << elem.fu << "} ";
+    //     std::cout << "src{" << elem.src.first << "," << elem.src.second << "} ";
+    //     std::cout << "dst{" << elem.dest << "} ";
+    //     std::cout<<"FE{"<<elem.FE.first<<", "<<elem.FE.second<<"} ";
+    //     std::cout<<"DE{"<<elem.DE.first<<", "<<elem.DE.second<<"} ";
+    //     std::cout<<"RN{"<<elem.RN.first<<", "<<elem.RN.second<<"} ";
+    //     std::cout<<"RR{"<<elem.RR.first<<", "<<elem.RR.second<<"} ";
+    //     std::cout<<"DI{"<<elem.DI.first<<", "<<elem.DI.second<<"} ";
+    //     std::cout<<"IS{"<<elem.IS.first<<", "<<elem.IS.second<<"} ";
+    //     std::cout<<"EX{"<<elem.EX.first<<", "<<elem.EX.second<<"} ";
+    //     std::cout<<"WB{"<<elem.WB.first<<", "<<elem.WB.second<<"} ";
+    //     std::cout<<"RT{"<<elem.RT.first<<", "<<elem.RT.second<<"} "<<std::endl;
+    //     i++;
+    // }
 
-    std::cout<<"# === Simulator Command ========"<<std::endl;
-    std::cout<<argv[0]<<" "<<params.rob_size<<" "<<params.iq_size<<" "<<params.width<<" "<<trace_file<<std::endl;
-    std::cout<<"# === Processor Configuration ===#"<<std::endl;
-    std::cout<<"ROB_SIZE = "<<params.rob_size<<std::endl;
-    std::cout<<"IQ_SIZE = "<<params.iq_size<<std::endl;
-    std::cout<<"WIDTH = "<<params.width<<std::endl;
-    std::cout<<"# === Simulator Results ========"<<std::endl;
+    std::cout<<"# === Simulator Command ========="<<std::endl;
+    std::cout<<"# "<<argv[0]<<" "<<params.rob_size<<" "<<params.iq_size<<" "<<params.width<<" "<<trace_file<<std::endl;
+    std::cout<<"# === Processor Configuration ==="<<std::endl;
+    std::cout<<"# ROB_SIZE = "<<params.rob_size<<std::endl;
+    std::cout<<"# IQ_SIZE = "<<params.iq_size<<std::endl;
+    std::cout<<"# WIDTH = "<<params.width<<std::endl;
+    std::cout<<"# === Simulation Results ========"<<std::endl;
     std::cout<<"# Dynamic Instruction Count = "<<dynamic_instrunct_count<<std::endl;
     std::cout<<"# Cycles = "<<sim_cycle<<std::endl;
-    printf("# Instructions Per Cycle = %.2f",float(dynamic_instrunct_count)/float(sim_cycle));
+    printf("# Instructions Per Cycle (IPC) = %.2f",float(dynamic_instrunct_count)/float(sim_cycle));
     // std::cout<<"# Instructions Per Cycle = "<<(((float(dynamic_instrunct_count)/float(sim_cycle))*100)/100)<<std::endl;
     
 
